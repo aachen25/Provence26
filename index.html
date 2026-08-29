@@ -1930,11 +1930,122 @@
     }
   });
 
+  /* ---- Sichern & Laden ---- */
+  function alleBilder(){ return dbp.then(function(db){ return new Promise(function(res){
+    var t = db.transaction('bilder'), s = t.objectStore('bilder'), out = {};
+    var kq = s.getAllKeys(), vq = s.getAll();
+    t.oncomplete = function(){ (kq.result||[]).forEach(function(k,i){ out[k] = (vq.result||[])[i]; }); res(out); };
+  });}); }
+
+  function sichern(btn){
+    var alt = btn.textContent; btn.textContent = 'sammelt …';
+    alleBilder().then(function(bilder){
+      var daten = { art:'reiseplanbuch', stand:new Date().toISOString(), text:txt, bilder:bilder };
+      var b = new Blob([JSON.stringify(daten)], {type:'application/json'});
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(b);
+      a.download = 'Erinnerungen-Provence-' + new Date().toISOString().slice(0,10) + '.json';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
+      btn.textContent = alt;
+    });
+  }
+
+  function laden(datei, btn){
+    var alt = btn.textContent; btn.textContent = 'liest …';
+    var fr = new FileReader();
+    fr.onload = function(){
+      var d;
+      try { d = JSON.parse(fr.result); } catch(e) { btn.textContent = alt; alert('Diese Datei kann ich nicht lesen.'); return; }
+      if (!d || d.art !== 'reiseplanbuch') { btn.textContent = alt; alert('Das ist keine Erinnerungs-Datei aus diesem Buch.'); return; }
+      var neu = 0;
+      Object.keys(d.text || {}).forEach(function(k){ if (txt[k] === undefined || txt[k] === '') { txt[k] = d.text[k]; neu++; } });
+      saveTxt();
+      var b = d.bilder || {}, keys = Object.keys(b);
+      Promise.all(keys.map(function(k){
+        return bildLesen(k).then(function(v){ if (!v) { neu++; return bildSchreiben(k, b[k]); } });
+      })).then(function(){
+        btn.textContent = alt;
+        alert(neu ? (neu + ' Erinnerungen übernommen. Die Seite wird neu geladen.') : 'Alles daraus war schon im Buch.');
+        if (neu) location.reload();
+      });
+    };
+    fr.readAsText(datei);
+  }
+
+  var leiste = document.createElement('div');
+  leiste.setAttribute('data-nicht-drucken','');
+  leiste.style.cssText = 'position:fixed;right:14px;bottom:14px;z-index:9999;display:flex;gap:8px;max-width:calc(100vw - 28px);flex-wrap:wrap;justify-content:flex-end;' +
+    'background:rgba(251,248,243,.94);backdrop-filter:blur(6px);border:1px solid #D8CFC2;padding:8px 9px;box-shadow:0 3px 14px rgba(60,50,40,.18)';
+  function knopf(text){
+    var b = document.createElement('button');
+    b.textContent = text;
+    b.style.cssText = JOST + ';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#4A7C93;' +
+      'background:none;border:1px solid #C9BFB1;padding:7px 11px;cursor:pointer;white-space:nowrap';
+    b.addEventListener('mouseenter', function(){ b.style.background = 'rgba(74,124,147,.09)'; });
+    b.addEventListener('mouseleave', function(){ b.style.background = 'none'; });
+    return b;
+  }
+  var bS = knopf('Sichern');
+  bS.addEventListener('click', function(){ sichern(bS); });
+  var bL = knopf('Laden');
+  var lInput = document.createElement('input');
+  lInput.type = 'file'; lInput.accept = '.json,application/json'; lInput.style.display = 'none';
+  bL.addEventListener('click', function(){ lInput.click(); });
+  lInput.addEventListener('change', function(){ if (lInput.files[0]) laden(lInput.files[0], bL); lInput.value = ''; });
+  leiste.appendChild(bS); leiste.appendChild(bL); leiste.appendChild(lInput);
+  document.body.appendChild(leiste);
+
   var st = document.createElement('style');
   st.textContent = '[contenteditable]:empty:before{content:attr(data-platzhalter);color:#C4BBAD}' +
     '[contenteditable]:focus{background:rgba(74,124,147,.06)}' +
-    '@media print{[contenteditable]:empty:before{content:""}}';
+    '@media print{[contenteditable]:empty:before{content:""}[data-nicht-drucken]{display:none}}';
   document.head.appendChild(st);
+})();
+</script>
+<script id="sprungmarken">
+(function(){
+  var JOST = "font-family:Jost,'Helvetica Neue',sans-serif";
+  var seiten = [].slice.call(document.querySelectorAll('.page'));
+  seiten.forEach(function(s, i){ if (!s.id) s.id = 'seite-' + (i+1); });
+
+  var knopf = document.createElement('button');
+  knopf.setAttribute('data-nicht-drucken','');
+  knopf.textContent = 'Inhalt';
+  knopf.style.cssText = JOST + ';position:fixed;left:14px;bottom:14px;z-index:9999;font-size:11px;' +
+    'letter-spacing:.18em;text-transform:uppercase;color:#4A7C93;background:rgba(251,248,243,.94);' +
+    'backdrop-filter:blur(6px);border:1px solid #D8CFC2;padding:9px 14px;cursor:pointer;box-shadow:0 3px 14px rgba(60,50,40,.18)';
+
+  var panel = document.createElement('nav');
+  panel.setAttribute('data-nicht-drucken','');
+  panel.style.cssText = 'position:fixed;left:14px;bottom:52px;z-index:9999;width:min(300px,80vw);' +
+    'max-height:70vh;overflow:auto;background:#FBF8F3;border:1px solid #D8CFC2;' +
+    'box-shadow:0 6px 26px rgba(60,50,40,.22);padding:10px 0;display:none;-webkit-overflow-scrolling:touch';
+
+  seiten.forEach(function(s){
+    var label = (s.getAttribute('data-screen-label') || '').replace(/^\d+\s*/, '');
+    var a = document.createElement('a');
+    a.href = '#' + s.id;
+    a.textContent = label;
+    a.style.cssText = JOST + ';display:block;font-size:13px;color:#33302B;text-decoration:none;padding:8px 16px;line-height:1.3';
+    a.addEventListener('mouseenter', function(){ a.style.background = 'rgba(74,124,147,.09)'; });
+    a.addEventListener('mouseleave', function(){ a.style.background = 'none'; });
+    a.addEventListener('click', function(e){
+      e.preventDefault();
+      window.scrollTo({ top: s.getBoundingClientRect().top + window.pageYOffset - 8, behavior: 'smooth' });
+      panel.style.display = 'none';
+    });
+    panel.appendChild(a);
+  });
+
+  knopf.addEventListener('click', function(e){
+    e.stopPropagation();
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+  document.addEventListener('click', function(e){ if (!panel.contains(e.target)) panel.style.display = 'none'; });
+
+  document.body.appendChild(panel);
+  document.body.appendChild(knopf);
 })();
 </script>
 </body>
