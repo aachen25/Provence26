@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <title>Reiseplanbuch Provence — 30. August bis 13. September 2026</title>
-<meta name="fassung" content="F-2026-08-30-a">
+<meta name="fassung" content="F-2026-08-30-b">
 <meta name="viewport" content="width=940, initial-scale=0.4, minimum-scale=0.25, maximum-scale=5, user-scalable=yes">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&display=swap">
@@ -48,7 +48,7 @@ a:hover { color: #C0703F; }
       <p style="font-size:1.85cqw;line-height:1.5;margin:1.5% 0 0;color:#7C766D">La Seyne-sur-Mer · Var · Provence</p>
     </div>
     <p style="font-family:Jost,sans-serif;font-size:1.5cqw;letter-spacing:.22em;text-transform:uppercase;color:#A69D91;margin:0;text-align:right">Für uns vier</p>
-  <p style="font-family:Jost,sans-serif;font-size:1.1cqw;letter-spacing:.24em;text-transform:uppercase;color:#B4A895;margin:2% 0 0">Fassung F-2026-08-30-a</p>
+  <p style="font-family:Jost,sans-serif;font-size:1.1cqw;letter-spacing:.24em;text-transform:uppercase;color:#B4A895;margin:2% 0 0">Fassung F-2026-08-30-b</p>
   </div>
 </section>
 
@@ -2223,9 +2223,9 @@ a:hover { color: #C0703F; }
   /* ---- Navigation, Sichern, Laden ---- */
   (function(){
     var seiten = [].slice.call(document.querySelectorAll('.page'));
-    var BTN = JOST + ";font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#EFE9E0;" +
-      "background:#33302B;border:0;border-radius:22px;padding:12px 18px;cursor:pointer;" +
-      "box-shadow:0 3px 12px rgba(40,34,28,.28);-webkit-tap-highlight-color:transparent";
+    var BTN = JOST + ";font-size:29px;letter-spacing:.14em;text-transform:uppercase;color:#EFE9E0;" +
+      "background:#33302B;border:0;border-radius:54px;padding:28px 42px;line-height:1;cursor:pointer;" +
+      "box-shadow:0 7px 28px rgba(40,34,28,.28);-webkit-tap-highlight-color:transparent";
 
     function zu(el){
       var y = el.getBoundingClientRect().top + (window.pageYOffset || document.documentElement.scrollTop) - 14;
@@ -2242,7 +2242,7 @@ a:hover { color: #C0703F; }
     lage.appendChild(blatt);
 
     var kopf = document.createElement('p');
-    kopf.style.cssText = JOST + ';font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:#C0703F;margin:0 22px 14px';
+    kopf.style.cssText = JOST + ';font-size:26px;letter-spacing:.3em;text-transform:uppercase;color:#C0703F;margin:0 52px 32px';
     kopf.textContent = 'Springen zu';
     blatt.appendChild(kopf);
 
@@ -2254,9 +2254,9 @@ a:hover { color: #C0703F; }
       a.type = 'button';
       a.style.cssText = 'display:grid;grid-template-columns:30px 1fr;gap:0 12px;align-items:baseline;width:100%;' +
         'text-align:left;background:none;border:0;border-bottom:1px solid rgba(201,191,177,.55);' +
-        'padding:11px 22px;cursor:pointer;-webkit-tap-highlight-color:transparent';
-      a.innerHTML = '<span style="' + JOST + ';font-size:11px;letter-spacing:.1em;color:#A69D91">' + m[1] + '</span>' +
-        '<span style="font-family:Lora,serif;font-size:15px;line-height:1.3;color:' +
+        'padding:26px 52px;cursor:pointer;-webkit-tap-highlight-color:transparent';
+      a.innerHTML = '<span style="' + JOST + ';font-size:25px;letter-spacing:.1em;color:#A69D91">' + m[1] + '</span>' +
+        '<span style="font-family:Lora,serif;font-size:35px;line-height:1.3;color:' +
         (kapitel ? '#C0703F' : '#33302B') + ';font-weight:' + (kapitel ? '600' : '400') + '">' + m[2] + '</span>';
       a.addEventListener('click', function(){ lage.style.display = 'none'; zu(s); });
       blatt.appendChild(a);
@@ -2266,8 +2266,8 @@ a:hover { color: #C0703F; }
 
     /* Leiste unten */
     var leiste = document.createElement('div');
-    leiste.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:10px;' +
-      'justify-content:space-between;align-items:center;padding:12px 14px;pointer-events:none';
+    leiste.style.cssText = 'position:fixed;left:0;right:0;bottom:0;z-index:50;display:flex;gap:24px;' +
+      'justify-content:space-between;align-items:center;padding:28px 32px;pointer-events:none';
     function knopf(text, fn, hell){
       var b = document.createElement('button');
       b.type = 'button'; b.textContent = text;
@@ -2277,8 +2277,8 @@ a:hover { color: #C0703F; }
     }
 
     var seite = document.createElement('span');
-    seite.style.cssText = JOST + ';font-size:11px;letter-spacing:.16em;color:#8C8478;background:rgba(239,233,224,.85);' +
-      'padding:7px 12px;border-radius:20px;pointer-events:none';
+    seite.style.cssText = JOST + ';font-size:26px;letter-spacing:.16em;color:#8C8478;background:rgba(239,233,224,.85);' +
+      'padding:17px 28px;border-radius:48px;pointer-events:none';
     function standAnzeigen(){
       var mitte = (window.pageYOffset || 0) + window.innerHeight / 2, n = 1;
       for (var i = 0; i < seiten.length; i++) if (seiten[i].offsetTop <= mitte) n = i + 1;
@@ -2335,7 +2335,7 @@ a:hover { color: #C0703F; }
       var b = document.createElement('button');
       b.type = 'button'; b.textContent = zeichen;
       b.setAttribute('aria-label', d < 0 ? 'Seite zurück' : 'Seite vor');
-      b.style.cssText = BTN + ';pointer-events:auto;padding:12px 15px;font-size:15px;letter-spacing:0';
+      b.style.cssText = BTN + ';pointer-events:auto;padding:24px 38px;font-size:40px;letter-spacing:0';
       b.addEventListener('click', function(){ schritt(d); });
       return b;
     }
